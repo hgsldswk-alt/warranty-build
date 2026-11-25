@@ -1,0 +1,162 @@
+name: Warranty
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+  knownRegions: [en, zh-Hans, zh-Hant]
+settings:
+  base:
+    APP_ID: com.hgsldswk.warranty
+    APP_STORE_ID: "6838834510"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  Warranty:
+    type: application
+    platform: iOS
+    sources: [Warranty, Shared]
+    dependencies:
+      - target: WarrantyWidget
+        embed: true
+      - target: WarrantyShare
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID)
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Warranty AppStore
+    entitlements:
+      path: Warranty/Warranty.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.hgsldswk.warranty]
+        keychain-access-groups: [$(AppIdentifierPrefix)com.hgsldswk.warranty.trial-anchor]
+    info:
+      path: Warranty/Info.plist
+      properties:
+        CFBundleDisplayName: Warranty
+        CFBundleDevelopmentRegion: en
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen:
+          UIColorName: Paper
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+        APP_STORE_ID: $(APP_STORE_ID)
+        TrialKeychainAccessGroup: $(AppIdentifierPrefix)com.hgsldswk.warranty.trial-anchor
+        NSCameraUsageDescription: Take a photo of a receipt or warranty card. Photos stay on this iPhone.
+        CFBundleURLTypes:
+          - CFBundleURLName: com.hgsldswk.warranty.open
+            CFBundleURLSchemes: [warrantykeep]
+  WarrantyWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - WarrantyWidget
+      - path: Shared
+        excludes: [ReceiptParser.swift, Transfer.swift]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).widget
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Warranty Widget AppStore
+    entitlements:
+      path: WarrantyWidget/WarrantyWidget.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.hgsldswk.warranty]
+    info:
+      path: WarrantyWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Warranty
+        CFBundleDevelopmentRegion: en
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+  WarrantyShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - WarrantyShare
+      - path: Shared
+        excludes: [ReceiptParser.swift, Transfer.swift]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).share
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Warranty Share AppStore
+    entitlements:
+      path: WarrantyShare/WarrantyShare.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.hgsldswk.warranty]
+    info:
+      path: WarrantyShare/Info.plist
+      properties:
+        CFBundleDisplayName: Warranty
+        CFBundleDevelopmentRegion: en
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsImageWithMaxCount: 3
+              NSExtensionActivationSupportsFileWithMaxCount: 1
+  WarrantyTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - WarrantyTests
+      - path: Shared
+        excludes: [Design.swift, PrivacyInfo.xcprivacy]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).tests
+        GENERATE_INFOPLIST_FILE: YES
+  WarrantyUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [WarrantyUITests]
+    dependencies:
+      - target: Warranty
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_ID).uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Warranty
+schemes:
+  Warranty:
+    build:
+      targets:
+        Warranty: all
+        WarrantyTests: [test]
+    test:
+      config: Debug
+      targets: [WarrantyTests]
+  WarrantyUI:
+    build:
+      targets:
+        Warranty: all
+        WarrantyUITests: [test]
+    test:
+      config: Debug
+      targets: [WarrantyUITests]
